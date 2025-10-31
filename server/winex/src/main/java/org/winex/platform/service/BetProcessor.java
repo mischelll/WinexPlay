@@ -13,44 +13,54 @@ import java.math.BigDecimal;
 public class BetProcessor {
     private final ITopic<Bet> topic;
     private final IMap<String, BigDecimal> stats;
+    private final HazelcastInstance hazelcastInstance;
 
-    public BetProcessor(ITopic<Bet> topic, HazelcastInstance hz) {
+    public BetProcessor(ITopic<Bet> topic, HazelcastInstance hz, HazelcastInstance hazelcastInstance) {
         this.topic = topic;
         this.stats = hz.getMap("liveStats");
+        this.hazelcastInstance = hazelcastInstance;
     }
 
     @PostConstruct
     public void listen() {
-        topic.addMessageListener(message -> {
-            Bet bet = message.getMessageObject();
-            String prefix = bet.getGame() + ".";
+        if (hazelcastInstance.getCluster().getMembers().iterator().next().equals(hazelcastInstance.getCluster().getLocalMember())) {
 
-            stats.lock(prefix + "totalBets");
-            try {
-                var bets = stats.getOrDefault(prefix + "totalBets", BigDecimal.ZERO);
-                stats.put(prefix + "totalBets", bets.add(BigDecimal.ONE));
-            } finally {
-                stats.unlock(prefix + "totalBets");
-            }
+            topic.addMessageListener(message -> {
+                if (hazelcastInstance.getCluster().getLocalMember().isLiteMember()) return;
 
-            stats.lock(prefix + "totalStake");
-            try {
-                var stake = stats.getOrDefault(prefix + "totalStake", BigDecimal.ZERO);
-                stats.put(prefix + "totalStake", bet.getStake().add(stake));
-            } finally {
-                stats.unlock(prefix + "totalStake");
-            }
 
-            stats.lock(prefix + "expectedPayout");
-            try {
-                var payout = stats.getOrDefault(prefix + "expectedPayout", BigDecimal.ZERO);
-                stats.put(prefix + "expectedPayout", bet.getStake().multiply(bet.getOdds()).add(payout));
-            } finally {
-                stats.unlock(prefix + "expectedPayout");
-            }
-            System.out.println("Processed bet: " + bet.getBetId() + " for game " + bet.getGame());
-        });
+                Bet bet = message.getMessageObject();
+                String prefix = bet.getGame() + ".";
 
-        System.out.println("Bet listener registered on bets-topic!");
+                stats.lock(prefix + "totalBets");
+                try {
+                    var bets = stats.getOrDefault(prefix + "totalBets", BigDecimal.ZERO);
+                    stats.put(prefix + "totalBets", bets.add(BigDecimal.ONE));
+                } finally {
+                    stats.unlock(prefix + "totalBets");
+                }
+
+                stats.lock(prefix + "totalStake");
+                try {
+                    var stake = stats.getOrDefault(prefix + "totalStake", BigDecimal.ZERO);
+                    stats.put(prefix + "totalStake", bet.getStake().add(stake));
+                } finally {
+                    stats.unlock(prefix + "totalStake");
+                }
+
+                stats.lock(prefix + "expectedPayout");
+                try {
+                    var payout = stats.getOrDefault(prefix + "expectedPayout", BigDecimal.ZERO);
+                    stats.put(prefix + "expectedPayout", bet.getStake().multiply(bet.getOdds()).add(payout));
+                } finally {
+                    stats.unlock(prefix + "expectedPayout");
+                }
+                System.out.println("Processed bet: " + bet.getBetId() + " for game " + bet.getGame());
+            });
+            System.out.println("Bet listener registered on bets-topic!");
+        } else {
+            System.out.println("This member is skipping Bet processing!");
+        }
+
     }
 }
