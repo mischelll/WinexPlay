@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.winex.betting.event.Bet;
 import org.winex.betting.service.BetPublisher;
+import org.winex.hazelcast.common.event.Bet;
 
 @RestController
 @RequestMapping("/bet")

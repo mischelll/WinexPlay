@@ -12,6 +12,7 @@ public class Bet implements Serializable {
     private String selection;
     private double odds;
     private Instant timestamp = Instant.now();
+    private String game;
 
     public String getBetId() {
         return betId;
@@ -67,5 +68,13 @@ public class Bet implements Serializable {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getGame() {
+        return game;
+    }
+
+    public void setGame(String game) {
+        this.game = game;
     }
 }

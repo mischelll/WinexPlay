@@ -5,8 +5,10 @@ import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.topic.ITopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.winex.hazelcast.common.event.Bet;
 
 import static org.winex.hazelcast.common.constants.HazelcastConstants.*;
 
@@ -41,5 +43,10 @@ public class HazelcastConfiguration {
         HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
         System.out.println("🚀 Hazelcast instance started: " + instance.getName());
         return instance;
+    }
+
+    @Bean
+    public ITopic<Bet> betsTopic(HazelcastInstance hazelcastInstance) {
+        return hazelcastInstance.getTopic(TOPIC_BET_EVENTS);
     }
 }

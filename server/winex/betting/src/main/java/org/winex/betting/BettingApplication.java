@@ -4,12 +4,15 @@ import com.hazelcast.core.HazelcastInstance;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Import;
+import org.winex.hazelcast.common.config.HazelcastConfiguration;
 
 @SpringBootApplication
-public class WinApplication {
+@Import(HazelcastConfiguration.class)
+public class BettingApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext ctx = SpringApplication.run(WinApplication.class, args);
+        ConfigurableApplicationContext ctx = SpringApplication.run(BettingApplication.class, args);
         HazelcastInstance hz = ctx.getBean(HazelcastInstance.class);
 
         System.out.println("==Hazelcast node started==: " + hz.getName());
