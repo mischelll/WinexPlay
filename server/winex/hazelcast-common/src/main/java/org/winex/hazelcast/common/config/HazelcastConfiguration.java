@@ -8,7 +8,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.topic.ITopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.winex.hazelcast.common.event.Bet;
+import org.winex.hazelcast.common.events.Bet;
 
 import static org.winex.hazelcast.common.constants.HazelcastConstants.*;
 

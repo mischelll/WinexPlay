@@ -5,7 +5,7 @@ import com.hazelcast.map.IMap;
 import com.hazelcast.topic.ITopic;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
-import org.winex.hazelcast.common.event.Bet;
+import org.winex.hazelcast.common.events.Bet;
 
 import java.math.BigDecimal;
 
@@ -27,9 +27,9 @@ public class BetProcessor {
 
             topic.addMessageListener(message -> {
                 if (hazelcastInstance.getCluster().getLocalMember().isLiteMember()) return;
-
-
                 Bet bet = message.getMessageObject();
+
+
             });
 
         }
