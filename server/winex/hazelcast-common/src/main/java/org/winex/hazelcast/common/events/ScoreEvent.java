@@ -1,4 +1,4 @@
-package org.winex.hazelcast.common.event;
+package org.winex.hazelcast.common.events;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
