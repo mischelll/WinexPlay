@@ -10,6 +10,7 @@ public class HazelcastConstants {
 
     // Topic names
     public static final String TOPIC_BET_EVENTS = "betEvents";
+    public static final String TOPIC_LIVE_MATCHES_EVENTS = "liveMatchesEvents";
     public static final String TOPIC_SCORE_EVENTS = "scoreEvents";
     public static final String TOPIC_MARKETS = "markets";
 }
