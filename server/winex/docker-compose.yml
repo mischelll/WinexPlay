@@ -1,0 +1,116 @@
+version: '3.8'
+
+# ==============================================
+# WinexPlay Development Infrastructure
+# Start with: docker-compose up -d
+# ==============================================
+
+services:
+  # ============================================
+  # PostgreSQL - Primary Database
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: winex-postgres
+    environment:
+      POSTGRES_USER: winex
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: winex_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts/postgres:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U winex -d winex_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - winex-network
+
+  # ============================================
+  # Kafka + Zookeeper - For AI Agent integration
+  # ============================================
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:7.5.0
+#    container_name: winex-zookeeper
+#    environment:
+#      ZOOKEEPER_CLIENT_PORT: 2181
+#      ZOOKEEPER_TICK_TIME: 2000
+#    ports:
+#      - "2181:2181"
+#    networks:
+#      - winex-network
+#
+#  kafka:
+#    image: confluentinc/cp-kafka:7.5.0
+#    container_name: winex-kafka
+#    depends_on:
+#      - zookeeper
+#    ports:
+#      - "9092:9092"
+#      - "29092:29092"
+#    environment:
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+#    networks:
+#      - winex-network
+#
+#  # Kafka UI - Debugging tool (optional, lightweight)
+#  kafka-ui:
+#    image: provectuslabs/kafka-ui:latest
+#    container_name: winex-kafka-ui
+#    depends_on:
+#      - kafka
+#    ports:
+#      - "8090:8080"
+#    environment:
+#      KAFKA_CLUSTERS_0_NAME: winex-cluster
+#      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+#    networks:
+#      - winex-network
+
+  # ============================================
+  # FUTURE ADDITIONS (commented out for now)
+  # ============================================
+  
+  # Redis - Uncomment when needed for sessions/caching
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: winex-redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - winex-network
+
+  # ClickHouse - Uncomment when needed for analytics
+  # clickhouse:
+  #   image: clickhouse/clickhouse-server:24.1
+  #   container_name: winex-clickhouse
+  #   ports:
+  #     - "8123:8123"
+  #     - "9000:9000"
+  #   networks:
+  #     - winex-network
+
+  # Hazelcast MC - Uncomment when using Hazelcast clustering
+  # hazelcast-mc:
+  #   image: hazelcast/management-center:5.3
+  #   container_name: winex-hazelcast-mc
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - winex-network
+
+volumes:
+  postgres_data:
+
+networks:
+  winex-network:
+    driver: bridge
